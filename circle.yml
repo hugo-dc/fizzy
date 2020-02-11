@@ -93,7 +93,6 @@ jobs:
           ./wat2wasm4cpp.py test/unittests/execute_control_test.cpp
           git diff --color --exit-code
 
-
   release-linux:
     executor: linux-gcc-9
     environment:
@@ -105,6 +104,7 @@ jobs:
           root: ~/build
           paths:
             - bin/fizzy-bench
+            - bin/fizzy-spectests
 
   release-macos:
     executor: macos
@@ -181,8 +181,6 @@ jobs:
   benchmark:
     machine:
       image: ubuntu-1604:201903-01
-    environment:
-      BUILD_TYPE: Release
     steps:
       - run:
           name: "Install standard libraries"
@@ -209,6 +207,20 @@ jobs:
           command: |
             ~/bin/fizzy-bench test/benchmarks --benchmark_color=true --benchmark_repetitions=3 --benchmark_min_time=1
 
+  spectest:
+    executor: linux-gcc-9
+    steps:
+      - run:
+          name: "Download spectest files"
+          command: |
+            git clone https://github.com/wasmx/wasm-spec --single-branch nofp-json
+      - attach_workspace:
+          at: "~"
+      - run:
+          name: "Run spectest"
+          command: |
+            ~/bin/fizzy-spectests --skip-validation nofp-json/test/core/json
+
 workflows:
   version: 2
   fizzy:
@@ -220,5 +232,8 @@ workflows:
       - clang-latest-asan
       - clang-latest-ubsan-tidy
       - benchmark:
+          requires:
+            - release-linux
+      - spectest:
           requires:
             - release-linux
