@@ -88,6 +88,23 @@ public:
                 }
                 pass();
             }
+            else if (type == "register")
+            {
+                const auto module_name =
+                    (cmd.find("name") != cmd.end() ? cmd["name"] : UnnamedModule);
+
+                const auto it_instance = instances.find(module_name);
+                if (it_instance == instances.end())
+                {
+                    skip("Module not found.");
+                    continue;
+                }
+
+                const auto registered_name = cmd.at("as").get<std::string>();
+
+                registered_names[registered_name] = module_name;
+                pass();
+            }
             else if (type == "assert_return" || type == "action")
             {
                 const auto& action = cmd.at("action");
@@ -289,6 +306,7 @@ private:
 
     test_settings settings;
     std::unordered_map<std::string, fizzy::Instance> instances;
+    std::unordered_map<std::string, std::string> registered_names;
     test_results results;
 };
 
