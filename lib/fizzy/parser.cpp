@@ -54,6 +54,15 @@ inline std::tuple<bool, const uint8_t*> parse_global_type(const uint8_t* pos, co
     return {is_mutable, pos};
 }
 
+const uint8_t* skip(size_t num_bytes, const uint8_t* input, const uint8_t* end)
+{
+    const uint8_t* ret = input + num_bytes;
+    if (ret >= end)
+        throw parser_error{"Unexpected EOF"};
+    return ret;
+}
+
+
 inline parser_result<ConstantExpression> parse_constant_expression(
     const uint8_t* pos, const uint8_t* end)
 {
@@ -99,6 +108,12 @@ inline parser_result<ConstantExpression> parse_constant_expression(
             result.value.constant = static_cast<uint64_t>(value);
             break;
         }
+        case Instr::f32_const:
+            pos = skip(4, pos, end);
+            break;
+        case Instr::f64_const:
+            pos = skip(8, pos, end);
+            break;
         }
     } while (instr != Instr::end);
 
