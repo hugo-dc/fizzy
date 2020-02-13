@@ -6,6 +6,14 @@ namespace fizzy
 {
 namespace
 {
+const uint8_t* skip(size_t num_bytes, const uint8_t* input, const uint8_t* end)
+{
+    const uint8_t* ret = input + num_bytes;
+    if (ret >= end)
+        throw parser_error{"Unexpected EOF"};
+    return ret;
+}
+
 template <typename T>
 inline void store(uint8_t* dst, T value) noexcept
 {
@@ -75,8 +83,17 @@ parser_result<Code> parse_expr(const uint8_t* pos, const uint8_t* end)
         case Instr::f64_load:
         case Instr::f32_store:
         case Instr::f64_store:
+            // alignment
+            std::tie(std::ignore, pos) = leb128u_decode<uint32_t>(pos, end);
+            // offset
+            std::tie(std::ignore, pos) = leb128u_decode<uint32_t>(pos, end);
+            break;
         case Instr::f32_const:
+            pos = skip(4, pos, end);
+            break;
         case Instr::f64_const:
+            pos = skip(8, pos, end);
+            break;
         case Instr::f32_eq:
         case Instr::f32_ne:
         case Instr::f32_lt:
@@ -139,8 +156,7 @@ parser_result<Code> parse_expr(const uint8_t* pos, const uint8_t* end)
         case Instr::i64_reinterpret_f64:
         case Instr::f32_reinterpret_i32:
         case Instr::f64_reinterpret_i64:
-            throw parser_error{
-                "unsupported floating point instruction " + std::to_string(*(pos - 1))};
+            break;
 
         case Instr::unreachable:
         case Instr::nop:
