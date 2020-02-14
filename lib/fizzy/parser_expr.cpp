@@ -6,14 +6,6 @@ namespace fizzy
 {
 namespace
 {
-const uint8_t* skip(size_t num_bytes, const uint8_t* input, const uint8_t* end)
-{
-    const uint8_t* ret = input + num_bytes;
-    if (ret >= end)
-        throw parser_error{"Unexpected EOF"};
-    return ret;
-}
-
 template <typename T>
 inline void store(uint8_t* dst, T value) noexcept
 {
