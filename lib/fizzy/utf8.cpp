@@ -1,5 +1,4 @@
 #include "utf8.hpp"
-#include "types.hpp"
 #include <cassert>
 
 /*
@@ -43,7 +42,7 @@ enum class Rule : unsigned
 
 namespace fizzy
 {
-bool utf8_validate(bytes_view input) noexcept
+bool utf8_validate(std::string_view input) noexcept
 {
     const auto len = input.size();
 
@@ -54,7 +53,7 @@ bool utf8_validate(bytes_view input) noexcept
     unsigned required_bytes = 1;
     auto rule = Rule::Range80BF;
 
-    const uint8_t byte1 = input[0];
+    const uint8_t byte1 = static_cast<uint8_t>(input[0]);
     if (byte1 <= 0x7F)
         // Shortcut for valid ASCII (also valid UTF-8)
         return true;
@@ -108,7 +107,7 @@ bool utf8_validate(bytes_view input) noexcept
         return false;
 
     // Byte2 may have exceptional encodings
-    const uint8_t byte2 = input[1];
+    const uint8_t byte2 = static_cast<uint8_t>(input[1]);
     switch (rule)
     {
     case Rule::Range80BF:
@@ -138,7 +137,7 @@ bool utf8_validate(bytes_view input) noexcept
     // Byte3 always has regular encoding
     if (required_bytes > 2)
     {
-        const uint8_t byte3 = input[2];
+        const uint8_t byte3 = static_cast<uint8_t>(input[2]);
         if (byte3 < 0x80 || byte3 > 0xBF)
             return false;
     }
@@ -146,7 +145,7 @@ bool utf8_validate(bytes_view input) noexcept
     // Byte4 always has regular encoding
     if (required_bytes > 3)
     {
-        const uint8_t byte4 = input[3];
+        const uint8_t byte4 = static_cast<uint8_t>(input[3]);
         if (byte4 < 0x80 || byte4 > 0xBF)
             return false;
     }

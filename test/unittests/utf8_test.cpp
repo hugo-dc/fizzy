@@ -18,6 +18,7 @@ TEST(utf8, validate)
     };
     for (auto const& testcase : testcases)
     {
-        EXPECT_EQ(utf8_validate(testcase.first), testcase.second);
+        const auto input = testcase.first;
+        EXPECT_EQ(utf8_validate(std::string(input.begin(), input.end())), testcase.second);
     }
 }

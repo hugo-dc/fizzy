@@ -1,6 +1,7 @@
 #include "parser.hpp"
 #include "leb128.hpp"
 #include "types.hpp"
+#include "utf8.hpp"
 #include <algorithm>
 
 namespace fizzy
@@ -139,12 +140,16 @@ inline parser_result<Memory> parse(const uint8_t* pos, const uint8_t* end)
 
 inline parser_result<std::string> parse_string(const uint8_t* pos, const uint8_t* end)
 {
+    // TODO: optimise this to avoid copying vec into string
+
     std::vector<uint8_t> value;
     std::tie(value, pos) = parse_vec<uint8_t>(pos, end);
 
-    // FIXME: need to validate that string is a valid UTF-8
+    const auto ret = std::string(value.begin(), value.end());
+    if (!utf8_validate(ret))
+        throw parser_error{"Invalid UTF8"};
 
-    return {std::string(value.begin(), value.end()), pos};
+    return {ret, pos};
 }
 
 template <>

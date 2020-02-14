@@ -1,8 +1,8 @@
 #pragma once
 
-#include "types.hpp"
+#include <string_view>
 
 namespace fizzy
 {
-bool utf8_validate(bytes_view input) noexcept;
+bool utf8_validate(std::string_view input) noexecpt;
 }  // namespace fizzy
