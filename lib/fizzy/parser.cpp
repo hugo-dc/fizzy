@@ -1,6 +1,7 @@
 #include "parser.hpp"
 #include "leb128.hpp"
 #include "types.hpp"
+#include "utf8.hpp"
 #include <algorithm>
 
 namespace fizzy
@@ -148,9 +149,11 @@ parser_result<std::string> parse_string(const uint8_t* pos, const uint8_t* end)
     if ((pos + size) > end)
         throw parser_error{"Unexpected EOF"};
 
-    // FIXME: need to validate that string is a valid UTF-8
     auto ret = std::string(pos, pos + size);
     pos += size;
+
+    if (!utf8_validate(ret))
+        throw parser_error{"Invalid UTF-8"};
 
     return {std::move(ret), pos};
 }
