@@ -69,10 +69,10 @@ struct test_results
 
 struct imports
 {
-    std::vector<fizzy::ImportedFunction> functions;
-    std::vector<fizzy::ImportedTable> tables;
-    std::vector<fizzy::ImportedMemory> memories;
-    std::vector<fizzy::ImportedGlobal> globals;
+    std::vector<fizzy::ExternalFunction> functions;
+    std::vector<fizzy::ExternalTable> tables;
+    std::vector<fizzy::ExternalMemory> memories;
+    std::vector<fizzy::ExternalGlobal> globals;
 };
 
 class test_runner
@@ -342,8 +342,7 @@ private:
 
     std::optional<imports> create_imports(const fizzy::Module& module)
     {
-        std::vector<fizzy::ImportedFunction> imported_functions;
-        std::vector<fizzy::ImportedGlobal> imported_globals;
+        std::vector<fizzy::ExternalFunction> imported_functions;
         for (auto const& import : module.importsec)
         {
             const auto it_registered = registered_names.find(import.module);
@@ -386,7 +385,7 @@ private:
             // TODO memory, table, globals
         }
 
-        return imports{imported_functions, {}, {}, imported_globals};
+        return imports{imported_functions, {}, {}, {}};
     }
 
     void pass()
