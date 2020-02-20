@@ -53,9 +53,7 @@ bool utf8_validate(const uint8_t* pos, const uint8_t* end) noexcept
         if (byte1 <= 0x7F)
             // Shortcut for valid ASCII (also valid UTF-8)
             continue;
-        else if (byte1 < 0xC2)
-            return false;
-        else if (byte1 <= 0xDF)
+        else if (byte1 >= 0xC2 && byte1 <= 0xDF)
         {
             required_bytes = 2;
             rule = Rule::Range80BF;
@@ -65,7 +63,7 @@ bool utf8_validate(const uint8_t* pos, const uint8_t* end) noexcept
             required_bytes = 3;
             rule = Rule::RangeA0BF;
         }
-        else if (byte1 <= 0xEC)
+        else if (byte1 <= 0xEC || byte1 == 0xEE || byte1 == 0xEF)
         {
             required_bytes = 3;
             rule = Rule::Range80BF;
@@ -74,11 +72,6 @@ bool utf8_validate(const uint8_t* pos, const uint8_t* end) noexcept
         {
             required_bytes = 3;
             rule = Rule::Range809F;
-        }
-        else if (byte1 <= 0xEF)
-        {
-            required_bytes = 3;
-            rule = Rule::Range80BF;
         }
         else if (byte1 == 0xF0)
         {
