@@ -12,5 +12,7 @@ target_sources(
     parser_expr.cpp
     stack.hpp
     types.hpp
+    utf8.cpp
+    utf8.hpp
 )
 target_compile_features(fizzy PUBLIC cxx_std_17)
