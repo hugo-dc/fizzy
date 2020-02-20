@@ -49,107 +49,107 @@ bool utf8_validate(std::string_view input) noexcept
 
     while (pos < len)
     {
-    unsigned required_bytes = 1;
-    auto rule = Rule::Range80BF;
+        unsigned required_bytes = 1;
+        auto rule = Rule::Range80BF;
 
-    const uint8_t byte1 = static_cast<uint8_t>(input[pos++]);
-    if (byte1 <= 0x7F)
-        // Shortcut for valid ASCII (also valid UTF-8)
-        return true;
-    else if (byte1 < 0xC2)
-        return false;
-    else if (byte1 <= 0xDF)
-    {
-        required_bytes = 2;
-        rule = Rule::Range80BF;
-    }
-    else if (byte1 == 0xE0)
-    {
-        required_bytes = 3;
-        rule = Rule::RangeA0BF;
-    }
-    else if (byte1 <= 0xEC)
-    {
-        required_bytes = 3;
-        rule = Rule::Range80BF;
-    }
-    else if (byte1 == 0xED)
-    {
-        required_bytes = 3;
-        rule = Rule::Range809F;
-    }
-    else if (byte1 <= 0xEF)
-    {
-        required_bytes = 3;
-        rule = Rule::Range80BF;
-    }
-    else if (byte1 == 0xF0)
-    {
-        required_bytes = 4;
-        rule = Rule::Range90BF;
-    }
-    else if (byte1 <= 0xF3)
-    {
-        required_bytes = 4;
-        rule = Rule::Range80BF;
-    }
-    else if (byte1 == 0xF4)
-    {
-        required_bytes = 4;
-        rule = Rule::Range808F;
-    }
-    else
-        return false;
+        const uint8_t byte1 = static_cast<uint8_t>(input[pos++]);
+        if (byte1 <= 0x7F)
+            // Shortcut for valid ASCII (also valid UTF-8)
+            return true;
+        else if (byte1 < 0xC2)
+            return false;
+        else if (byte1 <= 0xDF)
+        {
+            required_bytes = 2;
+            rule = Rule::Range80BF;
+        }
+        else if (byte1 == 0xE0)
+        {
+            required_bytes = 3;
+            rule = Rule::RangeA0BF;
+        }
+        else if (byte1 <= 0xEC)
+        {
+            required_bytes = 3;
+            rule = Rule::Range80BF;
+        }
+        else if (byte1 == 0xED)
+        {
+            required_bytes = 3;
+            rule = Rule::Range809F;
+        }
+        else if (byte1 <= 0xEF)
+        {
+            required_bytes = 3;
+            rule = Rule::Range80BF;
+        }
+        else if (byte1 == 0xF0)
+        {
+            required_bytes = 4;
+            rule = Rule::Range90BF;
+        }
+        else if (byte1 <= 0xF3)
+        {
+            required_bytes = 4;
+            rule = Rule::Range80BF;
+        }
+        else if (byte1 == 0xF4)
+        {
+            required_bytes = 4;
+            rule = Rule::Range808F;
+        }
+        else
+            return false;
 
-    // At this point need to read at least one more byte
-    if ((pos + len) < required_bytes)
-        return false;
+        // At this point need to read at least one more byte
+        if ((pos + len) < required_bytes)
+            return false;
 
-    assert(required_bytes > 1);
+        assert(required_bytes > 1);
 
-    // Byte2 may have exceptional encodings
-    const uint8_t byte2 = static_cast<uint8_t>(input[pos++]);
-    switch (rule)
-    {
-    case Rule::Range80BF:
-        if (byte2 < 0x80 || byte2 > 0xBF)
-            return false;
-        break;
-    case Rule::RangeA0BF:
-        if (byte2 < 0xA0 || byte2 > 0xBF)
-            return false;
-        break;
-    case Rule::Range809F:
-        if (byte2 < 0x80 || byte2 > 0x9F)
-            return false;
-        break;
-    case Rule::Range90BF:
-        if (byte2 < 0x90 || byte2 > 0xBF)
-            return false;
-        break;
-    case Rule::Range808F:
-        if (byte2 < 0x80 || byte2 > 0x8F)
-            return false;
-        break;
-    default:
-        assert(false);
-    }
+        // Byte2 may have exceptional encodings
+        const uint8_t byte2 = static_cast<uint8_t>(input[pos++]);
+        switch (rule)
+        {
+        case Rule::Range80BF:
+            if (byte2 < 0x80 || byte2 > 0xBF)
+                return false;
+            break;
+        case Rule::RangeA0BF:
+            if (byte2 < 0xA0 || byte2 > 0xBF)
+                return false;
+            break;
+        case Rule::Range809F:
+            if (byte2 < 0x80 || byte2 > 0x9F)
+                return false;
+            break;
+        case Rule::Range90BF:
+            if (byte2 < 0x90 || byte2 > 0xBF)
+                return false;
+            break;
+        case Rule::Range808F:
+            if (byte2 < 0x80 || byte2 > 0x8F)
+                return false;
+            break;
+        default:
+            assert(false);
+        }
 
-    // Byte3 always has regular encoding
-    if (required_bytes > 2)
-    {
-        const uint8_t byte3 = static_cast<uint8_t>(input[pos++]);
-        if (byte3 < 0x80 || byte3 > 0xBF)
-            return false;
-    }
+        // Byte3 always has regular encoding
+        if (required_bytes > 2)
+        {
+            const uint8_t byte3 = static_cast<uint8_t>(input[pos++]);
+            if (byte3 < 0x80 || byte3 > 0xBF)
+                return false;
+        }
 
-    // Byte4 always has regular encoding
-    if (required_bytes > 3)
-    {
-        const uint8_t byte4 = static_cast<uint8_t>(input[pos++]);
-        if (byte4 < 0x80 || byte4 > 0xBF)
-            return false;
-    }
+        // Byte4 always has regular encoding
+        if (required_bytes > 3)
+        {
+            const uint8_t byte4 = static_cast<uint8_t>(input[pos++]);
+            if (byte4 < 0x80 || byte4 > 0xBF)
+                return false;
+        }
     }
 
     return true;
