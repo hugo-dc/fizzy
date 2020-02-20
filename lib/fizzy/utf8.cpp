@@ -45,15 +45,14 @@ namespace fizzy
 bool utf8_validate(std::string_view input) noexcept
 {
     const auto len = input.size();
+    unsigned pos = 0;
 
-    // Shortcut for empty inputs
-    if (len < 1)
-        return true;
-
+    while (pos < len)
+    {
     unsigned required_bytes = 1;
     auto rule = Rule::Range80BF;
 
-    const uint8_t byte1 = static_cast<uint8_t>(input[0]);
+    const uint8_t byte1 = static_cast<uint8_t>(input[pos++]);
     if (byte1 <= 0x7F)
         // Shortcut for valid ASCII (also valid UTF-8)
         return true;
@@ -103,11 +102,11 @@ bool utf8_validate(std::string_view input) noexcept
         return false;
 
     // At this point need to read at least one more byte
-    if (len < required_bytes)
+    if ((pos + len) < required_bytes)
         return false;
 
     // Byte2 may have exceptional encodings
-    const uint8_t byte2 = static_cast<uint8_t>(input[1]);
+    const uint8_t byte2 = static_cast<uint8_t>(input[pos++]);
     switch (rule)
     {
     case Rule::Range80BF:
@@ -137,7 +136,7 @@ bool utf8_validate(std::string_view input) noexcept
     // Byte3 always has regular encoding
     if (required_bytes > 2)
     {
-        const uint8_t byte3 = static_cast<uint8_t>(input[2]);
+        const uint8_t byte3 = static_cast<uint8_t>(input[pos++]);
         if (byte3 < 0x80 || byte3 > 0xBF)
             return false;
     }
@@ -145,9 +144,10 @@ bool utf8_validate(std::string_view input) noexcept
     // Byte4 always has regular encoding
     if (required_bytes > 3)
     {
-        const uint8_t byte4 = static_cast<uint8_t>(input[3]);
+        const uint8_t byte4 = static_cast<uint8_t>(input[pos++]);
         if (byte4 < 0x80 || byte4 > 0xBF)
             return false;
+    }
     }
 
     return true;
