@@ -364,18 +364,15 @@ private:
 
             if (import.kind == fizzy::ExternalKind::Function)
             {
-                const auto func_idx = fizzy::find_exported_function(instance.module, import.name);
-                if (!func_idx.has_value())
+                const auto func = fizzy::find_exported_function(instance, import.name);
+                if (!func.has_value())
                 {
                     fail(
                         "Function \"" + import.name + "\" not found in \"" + import.module + "\".");
                     return std::nullopt;
                 }
 
-                result.functions.emplace_back(
-                    [&instance, func_idx](fizzy::Instance&, std::vector<uint64_t> args) {
-                        return fizzy::execute(instance, *func_idx, std::move(args));
-                    });
+                result.functions.emplace_back(*func);
             }
             else if (import.kind == fizzy::ExternalKind::Table)
             {
