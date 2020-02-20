@@ -22,6 +22,7 @@ target_sources(
     parser_test.cpp
     stack_test.cpp
     wasm_engine_test.cpp
+    utf8_test.cpp
 )
 
 gtest_discover_tests(
