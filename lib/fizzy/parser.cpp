@@ -149,11 +149,11 @@ parser_result<std::string> parse_string(const uint8_t* pos, const uint8_t* end)
     if ((pos + size) > end)
         throw parser_error{"Unexpected EOF"};
 
+    if (!utf8_validate(pos, pos + size))
+        throw parser_error{"Invalid UTF-8"};
+
     auto ret = std::string(pos, pos + size);
     pos += size;
-
-    if (!utf8_validate(ret))
-        throw parser_error{"Invalid UTF-8"};
 
     return {std::move(ret), pos};
 }
