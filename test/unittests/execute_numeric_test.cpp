@@ -774,6 +774,25 @@ TEST(execute_numeric, i32_shr_s)
     EXPECT_RESULT(execute_binary_operation(Instr::i32_shr_s, 0x7fffffff, 63), int32_t(0));
 }
 
+TEST(execute_numeric, i32_shr_s_stack_value)
+{
+    /* wat2wasm
+    (func $main (result i32)
+      i32.const -1
+      i32.const 0
+      i32.shr_s         ;; Must put 0xffffffff on the stack.
+      i64.extend_u/i32
+      i64.const 31
+      i64.shr_s
+      i32.wrap/i64
+    )
+    */
+    const auto wasm =
+        from_hex("0061736d010000000105016000017f030201000a0e010c00417f410075ad421f87a70b");
+
+    EXPECT_RESULT(execute(parse(wasm), 0, {}), 1);
+}
+
 TEST(execute_numeric, i32_shr_u)
 {
     EXPECT_RESULT(execute_binary_operation(Instr::i32_shr_u, 84, 1), 42);
