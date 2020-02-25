@@ -54,6 +54,7 @@ bool utf8_validate(const uint8_t* pos, const uint8_t* end) noexcept
             // Shortcut for valid ASCII (also valid UTF-8)
             continue;
         else if (byte1 < 0xC2)
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             return false;
         else if (byte1 <= 0xDF)
         {
@@ -66,6 +67,7 @@ bool utf8_validate(const uint8_t* pos, const uint8_t* end) noexcept
             rule = Rule::RangeA0BF;
         }
         else if (byte1 <= 0xEC)
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         {
             required_bytes = 3;
             rule = Rule::Range80BF;
