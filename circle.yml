@@ -177,6 +177,7 @@ jobs:
     executor: linux-clang-9
     environment:
       BUILD_TYPE: Debug
+      UBSAN_OPTIONS: halt_on_error=1
       CMAKE_OPTIONS: -DSANITIZE=undefined,implicit-conversion,nullability -DCMAKE_CXX_CLANG_TIDY=clang-tidy-9
     steps:
       - run:
