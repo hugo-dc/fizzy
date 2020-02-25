@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <limits>
 
+static_assert((int8_t{-1} >> 1) == int8_t{-1},
+    "signed LEB128 decoder assumes arithmetic shift of negative values");
+
 namespace fizzy
 {
 template <typename T>
@@ -63,11 +66,10 @@ std::pair<T, const uint8_t*> leb128s_decode(const uint8_t* input, const uint8_t*
             else
             {
                 // terminal byte of the encoding, need to check unused bits
-                const auto unused_bits_mask = ~static_cast<uint8_t>(all_ones >> result_shift);
-                // unused bits must be set if and only if sign bit is set
-                const auto unused_bits_expected =
-                    static_cast<T>(result) < 0 ? (unused_bits_mask & 0x7F) : 0;
-                if ((*input & unused_bits_mask) != unused_bits_expected)
+                const auto expected =
+                    (static_cast<uint8_t>(static_cast<T>(result) >> result_shift) & 0x7f);
+
+                if (*input != expected)
                 {
                     throw parser_error(
                         "Invalid LEB128 encoding: unused bits not equal to sign bit.");
