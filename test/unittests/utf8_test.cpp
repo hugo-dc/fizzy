@@ -5,13 +5,22 @@
 
 using namespace fizzy;
 
+namespace
+{
+inline bool utf8_validate(bytes_view input)
+{
+    return fizzy::utf8_validate(input.begin(), input.end());
+}
+}  // namespace
+
 TEST(utf8, invalid_first_bytes)
 {
-    std::vector<std::string> testcases;
-    for (unsigned c = 0x80; c < 0xC2; c++)
-        testcases.push_back(std::string(1, static_cast<char>(c)));
-    for (unsigned c = 0xF5; c <= 0xFF; c++)
-        testcases.push_back(std::string(1, static_cast<char>(c)));
+    std::vector<bytes> testcases;
+    for (uint8_t c = 0x80; c < 0xC2; c++)
+        testcases.push_back(bytes(1, c));
+    for (uint8_t c = 0xF5; c < 0xFF; c++)
+        testcases.push_back(bytes(1, c));
+    testcases.push_back("ff"_bytes);
     for (auto const& testcase : testcases)
         EXPECT_FALSE(utf8_validate(testcase));
 }
@@ -109,8 +118,5 @@ TEST(utf8, validate)
         {"616263c2bfe0a080ecbabaed9fbfee8181efaa81f09081a0f1a0a081f4819f85"_bytes, true},
     };
     for (auto const& testcase : testcases)
-    {
-        const auto input = testcase.first;
-        EXPECT_EQ(utf8_validate(std::string(input.begin(), input.end())), testcase.second);
-    }
+        EXPECT_EQ(utf8_validate(testcase.first), testcase.second);
 }
