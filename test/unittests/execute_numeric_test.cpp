@@ -671,6 +671,21 @@ TEST(execute_numeric, i32_div_s_overflow)
     ASSERT_TRUE(trap);
 }
 
+TEST(execute_numeric, i32_div_s_stack_value)
+{
+    /* wat2wasm
+    (func (result i32)
+      (i32.div_s (i32.const -3) (i32.const 2))
+      (i64.shr_s (i64.extend_u/i32) (i64.const 31))
+      i32.wrap/i64
+    )
+    */
+    const auto wasm =
+        from_hex("0061736d010000000105016000017f030201000a0e010c00417d41026dad421f87a70b");
+
+    EXPECT_RESULT(execute(parse(wasm), 0, {}), 1);
+}
+
 TEST(execute_numeric, i32_div_u)
 {
     const auto [trap, ret] = execute_binary_operation(Instr::i32_div_u, 84, 2);
@@ -699,6 +714,21 @@ TEST(execute_numeric, i32_rem_s_by_zero)
     const auto [trap, ret] = execute_binary_operation(Instr::i32_rem_s, uint64_t(-4242), 0);
 
     ASSERT_TRUE(trap);
+}
+
+TEST(execute_numeric, i32_rem_s_stack_value)
+{
+    /* wat2wasm
+    (func (result i32)
+      (i32.rem_s (i32.const -3) (i32.const 2))
+      (i64.shr_s (i64.extend_u/i32) (i64.const 31))
+      i32.wrap/i64
+    )
+    */
+    const auto wasm =
+        from_hex("0061736d010000000105016000017f030201000a0e010c00417d41026fad421f87a70b");
+
+    EXPECT_RESULT(execute(parse(wasm), 0, {}), 1);
 }
 
 TEST(execute_numeric, i32_rem_u)
