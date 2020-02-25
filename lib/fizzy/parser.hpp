@@ -78,6 +78,9 @@ inline parser_result<std::vector<T>> parse_vec(const uint8_t* pos, const uint8_t
     uint32_t size;
     std::tie(size, pos) = leb128u_decode<uint32_t>(pos, end);
 
+    if (size > 0xffff)
+        throw parser_error{"vec too big: " + std::to_string(size)};
+
     std::vector<T> result;
     result.reserve(size);
     auto inserter = std::back_inserter(result);
